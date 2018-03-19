@@ -1,0 +1,9 @@
+node_modules/
+.vscode/
+.vs/
+bin/**/**
+!bin/ani/**
+!bin/libs/*.js
+!bin/index.html
+!bin/unpack.json
+*.log

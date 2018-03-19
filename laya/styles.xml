@@ -1,0 +1,9 @@
+<res>
+   <item name="board/trench.png" type="Image" compress="0" pack="2" quality="80" props="" picType="0" scale="0"/>
+   <item name="font" type="" compress="0" pack="2" quality="80" props="" picType="0" scale="0"/>
+   <item name="loadding" type="" compress="0" pack="1" quality="80" props="" picType="0" scale="0"/>
+   <item name="loadding/desc.png" type="Image" compress="0" pack="1" quality="80" props="" picType="0" scale="0"/>
+   <item name="loadding/logo.png" type="Image" compress="0" pack="2" quality="80" props="" picType="0" scale="0"/>
+   <item name="loadding/prbbar.png" type="Image" compress="0" pack="1" quality="80" props="" picType="0" scale="0"/>
+   <item name="loadding/prgwrap.png" type="Image" compress="0" pack="1" quality="80" props="" picType="0" scale="0"/>
+</res>
