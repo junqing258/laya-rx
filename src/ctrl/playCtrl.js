@@ -141,6 +141,7 @@ export function getMaxBet() {
 
 let baseInint = true;
 export function getGameBaseInfo() {
+    if (!checkLogin()) return;
     axios.get(`?act=game_gamebase&st=queryUserAccount&gameId=${gameId}&Type=1`, { timeout: 5000 })
         .then(response=> {
             if (response.status == 200 && typeof response.data === "object") {
@@ -152,4 +153,4 @@ export function getGameBaseInfo() {
             }
         });
 }
-if (checkLogin()) getGameBaseInfo();
+getGameBaseInfo();
