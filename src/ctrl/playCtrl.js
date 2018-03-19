@@ -33,8 +33,8 @@ export function subscribeStore(key, callback, component) {
             subscription.dispose();
             subscription = null;
         } else if (subscription._prestate !== data) {
-            callback.call(component, data, state);
             subscription._prestate = data;
+            callback.call(component, data, state);
         }
     });
     subscription.next(observable.seed);
