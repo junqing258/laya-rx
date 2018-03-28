@@ -1,16 +1,25 @@
 {
-  "presets": ["env","stage-0"],
+  "presets": [
+    "env",
+    "stage-0"
+  ],
   "env": {
     "targets": {
-      "browsers": ["last 2 versions", "safari >= 7"]
+      "browsers": [
+        "last 2 versions",
+        "safari >= 7"
+      ]
     }
   },
   "plugins": [
-	 ["transform-async-to-module-method", {
-      	"module": "bluebird",
-      	"method": "coroutine"
-     }],
-     ["transform-decorators-legacy"],
-	 "transform-decorators"
-  ] 
+    [
+      "transform-async-to-module-method",
+      {
+        "module": "bluebird",
+        "method": "coroutine"
+      }
+    ],
+    "transform-decorators-legacy",
+    "transform-class-properties"
+  ]
 }
