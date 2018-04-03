@@ -125,12 +125,13 @@ export function getDefaultBet() {
     if (userid) {
         betAmount = parseInt(localStorage.getItem(`defaultBet${GM.gameId + userid}`));
         if (betAmount) return betAmount;
-        let gameBase = getDataByKey("gameBase");
-        let gameScore = gameBase.get("gameScore"),
+        let gameBase = getDataByKey("gameBase"),
+            gameScore = gameBase.get("gameScore"),
             TCoin = gameBase.get("TCoin");
-        let b = Math.max(100, getMaxBet() * 0.01),
+        let b = Math.max(10, Math.min(500000, Math.max(gameScore, TCoin) * 0.01)),
             s = getBetScope(b);
         betAmount = b - b % s;
+        setStoreState( {"BET_CALCULATE": true } );
         return betAmount;
     }
     return betAmount;
