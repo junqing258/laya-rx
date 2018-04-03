@@ -85,7 +85,11 @@ export function playStart() {
             bet: betAmout,
             isAuto: 0
         });
-    }).delay(500).timeout(5000, new Error('TimeOut'));
+    }).delay(500).timeout(5000, new Error('TimeOut'))
+        .doOnError(err=> {
+            Log.info(err);
+            setTimeout(roundEnd, 100);
+        });
 }
 
 
