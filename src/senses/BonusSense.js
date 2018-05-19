@@ -1,5 +1,5 @@
 
-import BonusBorad from "view/playcompone/BonusBorad";
+import BonusBorad from "components/playcompone/BonusBorad";
 
 export default class BonusSense {
 
