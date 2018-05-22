@@ -8,17 +8,21 @@
         }        
     },
     "rules": {
+        "flowtype/no-types-missing-file-annotation": 1,
         "comma-dangle": ["off", "always-multiline"],
         "semi": 1,
         "babel/new-cap": 1,
         "babel/no-invalid-this": 1,
-        "flowtype/no-types-missing-file-annotation": 1
+        "linebreak-style": ["error", "windows"],
+        "indent": [ "error", 4 ]
     },
     "extends": [
-        "plugin:flowtype/recommended"
+        "plugin:flowtype/recommended",
+        "airbnb-base/legacy" 
     ], 
     "plugins": [
         "babel",
+
         "flowtype"
     ]
 }

@@ -12,7 +12,7 @@ import { COMMON_ASSET } from "const/assets";
 
 const { Stage, Sprite, Event, Handler, Text } = Laya;
 
-export default function App() {
+export default function App() { 
 
     var stage;
     Laya.init(1334, 750, Laya.WebGL);
