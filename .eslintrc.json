@@ -14,7 +14,8 @@
         "babel/new-cap": 1,
         "babel/no-invalid-this": 1,
         "linebreak-style": ["error", "windows"],
-        "indent": [ "error", 4 ]
+        "indent": [ 1, 4 ],
+        "quotes": [0, "double", { "allowTemplateLiterals": true }]
     },
     "extends": [
         "plugin:flowtype/recommended",
