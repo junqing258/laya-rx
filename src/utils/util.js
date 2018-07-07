@@ -1,31 +1,22 @@
-export function backOut2 (t,b,c,d,s) {
-	s= 1.70158 * 5;
-	return c *((t=t / d-1)*t *((s+1)*t+s)+1)+b;
-};
-
-export function backOut(t) {
-    var s = 1.70158 * 1;
-    return --t * t * ((s + 1) * t + s) + 1;
-}
-
-export function sineOut(t) {
-    return Math.sin(t * Math.PI/2);
-}
-
-export function quarticOut(t) {
-    return Math.pow(t - 1.0, 3.0) * (1.0 - t) + 1.0
-}
   
-
-export function mixin(targetClass) {
-    let mixins = Array.prototype.slice.call(arguments);
-    mixins = mixins.slice(1);
-    mixins.forEach(mixinClass=> {
-        Object.keys(mixinClass.prototype).forEach((key, index)=> {
-            targetClass.prototype[key] = mixin.prototype[key];
-        });
-    });
-    return targetClass;
+export function mix(Mix, ...mixins) {
+    for (let mixin of mixins) {
+        copyProperties(Mix, mixin);
+        copyProperties(Mix.prototype, mixin.prototype);
+    }
+    return Mix;
+}
+ 
+function copyProperties(target, source) {
+    for (let key of Reflect.ownKeys(source)) {
+        if ( key !== "constructor"
+            && key !== "prototype"
+            && key !== "name"
+        ) {
+            let desc = Object.getOwnPropertyDescriptor(source, key);
+            Object.defineProperty(target, key, desc);
+        }
+    }
 }
 
 export function uuid() {
