@@ -24,7 +24,7 @@ function getCommitId() {
 		let git_rev = child_process.spawn('git', ['rev-parse', '--short', 'HEAD']);
 		git_rev.stdout.on('data', (data) => {
 			commint_id = String(data).replace(/\n/, '');
-			console.log(`COMMINT ID: ${data}`);
+			console.log(`commint id: ${data}`);
 		});
 		git_rev.stderr.on('data', reject);
 		git_rev.on('close', (code) => {
