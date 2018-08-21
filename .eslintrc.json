@@ -11,10 +11,13 @@
         "flowtype/no-types-missing-file-annotation": 1,
         "comma-dangle": ["off", "always-multiline"],
         "semi": 1,
+        "camelcase": 0,
+        "one-var": 0,
+        "indent": ["error", "tab"],
+        "no-tabs": "off",
         "babel/new-cap": 1,
         "babel/no-invalid-this": 1,
-        "linebreak-style": ["error", "windows"],
-        "indent": [ 1, 4 ],
+        "linebreak-style": [0, "windows"],
         "quotes": [0, "double", { "allowTemplateLiterals": true }]
     },
     "extends": [
@@ -23,7 +26,6 @@
     ], 
     "plugins": [
         "babel",
-
         "flowtype"
     ]
 }
