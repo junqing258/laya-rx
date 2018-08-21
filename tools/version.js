@@ -3,7 +3,6 @@ const path = require('path');
 const async = require('async');
 const child_process = require('child_process');
 
-
 const exclude = ["js", "libs", "data", "sounds", "laya", ".rec", "index.html", "index_zsy.html"];
 
 const root_path = path.resolve(__dirname, "../");
@@ -16,7 +15,7 @@ let atlas = [];
 let unpack_json;
 
 let commint_id = '';
-let last_commit = 'df6fc4a';
+let last_commit = '69f0d43';
 let diff_list = [];
 
 function getCommitId() {
@@ -62,7 +61,7 @@ function fileDisplay(file_path, cb) {
 	let files = fs.readdirSync(file_path);
 	async.eachSeries(files, (file_name, next) => {
 		if (exclude.includes(file_name)) return next();
-		var filedir = path.join(file_path, file_name);
+		let filedir = path.join(file_path, file_name);
 		let stats = fs.statSync(filedir);
 		if (stats.isFile()) {
 			setVersion(file_path, file_name).then(next);
