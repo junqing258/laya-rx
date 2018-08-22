@@ -63,10 +63,9 @@ var LoaddingUI=(function(_super){
 		    
 			laya.ui.Component.prototype.createChildren.call(this);
 			this.createView(LoaddingUI.uiView);
+
 		}
 
-		STATICATTR$(LoaddingUI,
-		['uiView',function(){return this.uiView={"type":"View","props":{"width":1334,"height":750},"child":[{"type":"Image","props":{"skin":"loadding/bgloadding.jpg"}},{"type":"Image","props":{"x":74,"skin":"loadding/desc.png","bottom":35}},{"type":"Image","props":{"x":232,"skin":"loadding/prgwrap.png","centerY":235},"child":[{"type":"Image","props":{"y":7,"x":10,"width":14,"var":"progressBar","skin":"loadding/prbbar.png","sizeGrid":"0,14,0,14"}}]},{"type":"Image","props":{"x":330,"skin":"loadding/logo.png","centerY":-70}},{"type":"Label","props":{"x":523,"width":287,"var":"progressLabel","text":"正在加载中...99%","height":24,"fontSize":24,"font":"SimHei","color":"#edc8a6","centerY":185,"align":"center"}}]};}
-		]);
+		LoaddingUI.uiView={"type":"View","props":{"width":1334,"height":750},"child":[{"type":"Image","props":{"skin":"loadding/bgloadding.jpg"}},{"type":"Image","props":{"x":74,"skin":"loadding/desc.png","bottom":35}},{"type":"Image","props":{"x":232,"skin":"loadding/prgwrap.png","centerY":235},"child":[{"type":"Image","props":{"y":7,"x":10,"width":14,"var":"progressBar","skin":"loadding/prbbar.png","sizeGrid":"0,14,0,14"}}]},{"type":"Image","props":{"x":330,"skin":"loadding/logo.png","centerY":-70}},{"type":"Label","props":{"x":523,"width":287,"var":"progressLabel","text":"正在加载中...99%","height":24,"fontSize":24,"font":"SimHei","color":"#edc8a6","centerY":185,"align":"center"}}]};
 		return LoaddingUI;
 	})(View);
