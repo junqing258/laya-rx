@@ -7,8 +7,8 @@ const webpackDevServer = require('webpack-dev-server');
 const localServer = require('./server/index');
 
 
-var env = process.env.NODE_ENV || 'development';
-var definePlugin = new webpack.DefinePlugin({
+const env = process.env.NODE_ENV || 'development';
+const definePlugin = new webpack.DefinePlugin({
     __DEV__: env !== "production"
 });
 
@@ -32,22 +32,25 @@ module.exports = {
         filename: 'js/bundle.js'
     },
     watch: env !== "production",
-    // optimization: {
-    //     minimize: true,
-    //     minimizer: [
-    //         new UglifyJsPlugin({
-    //             drop_console: true,
-    //             compress: true,
-    //             mangle: false,
-    //             output: {
-    //                 comments: false,
-    //             },
-    //             beautify: false,
-    //             sourceMap: false,
-    //             test: /js\/.*\.js($|\?)/i
-    //         })
-    //     ]
-    // },
+    optimization: {
+        // minimize: true,
+        minimizer: [
+            new UglifyJsPlugin({
+                // test: /js\/.*\.js($|\?)/i,
+                sourceMap: false,
+                warningsFilter: false,
+                uglifyOptions: {
+                    warnings: false,
+                    comments: false,
+                    keep_classnames: true,
+                    keep_fnames: true,
+                    compress: {
+                        drop_console: true
+                    }
+                }
+            })
+        ]
+    },
     plugins: plugins,
     module: {
         rules: [{
