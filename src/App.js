@@ -4,16 +4,13 @@ import "ui/layaUI.max.all.js";
 
 import { socket } from "ctrl/socket";
 import SenseManager from "utils/SenseManager";
-import LoaddingSense from "senses/LoaddingSense";
-import MasterSense from "senses/MasterSense";
 
 import { COMMON_ASSET } from "const/assets";
 
 
-const { Stage, Sprite, Event, Handler, Text } = Laya;
+const { Stage, Handler } = Laya;
 
-export default function App() { 
-
+export default function App() {
     var stage;
     Laya.init(1334, 750, Laya.WebGL);
     stage = Laya.stage;
@@ -23,10 +20,8 @@ export default function App() {
     stage.screenMode = Stage.SCREEN_HORIZONTAL;
     stage.bgColor = "#46ABFC";
 
-
     Laya.loader.load(COMMON_ASSET, Handler.create(null, ()=> {
         if (window.bigRender) window.bigRender.clear();
         SenseManager.loadSense('/loadding');
     }));
-
 }
