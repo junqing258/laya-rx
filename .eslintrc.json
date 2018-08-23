@@ -7,13 +7,17 @@
             "js": true
         }        
     },
+    "globals": {
+        "Laya": true,
+        "laya": true
+    },
     "rules": {
         "flowtype/no-types-missing-file-annotation": 1,
         "comma-dangle": ["off", "always-multiline"],
         "semi": 1,
         "camelcase": 0,
         "one-var": 0,
-        "indent": ["error", "tab"],
+        "indent": [0, "tab"],
         "no-tabs": "off",
         "babel/new-cap": 1,
         "babel/no-invalid-this": 1,
