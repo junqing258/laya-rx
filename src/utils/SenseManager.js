@@ -20,7 +20,7 @@ export default class SenseManager {
         });
     }
 
-    static loadSense(router, payload, cb, passivity) {
+    static loadSense(router, payload, cb) {
         let index = routerList.indexOf(router);
         if (index===-1) return console.warn(`${router} not registered`);
         if (curRouter && !curSense.actived) return console.warn(`${curRouter} not actived`);
@@ -31,8 +31,8 @@ export default class SenseManager {
         lockedHash = true;
         let promiselist = [];
         if (curRouter && typeof curSense.willUnMount === "function") {
-            let p1 = curSense.willUnMount(passivity);
-            if (passivity && p1 instanceof Promise) promiselist.push(p1);
+            let p1 = curSense.willUnMount();
+            if (p1 instanceof Promise) promiselist.push(p1);
         };
         if (typeof preProto.willMount === "function") {
             let p2 =  preProto.willMount();
