@@ -30,6 +30,7 @@
   "dependencies": {
     "crypto-js": "^3.1.9-1",
     "jsencrypt": "^3.0.0-rc.1",
+    "mockjs": "^1.0.1-beta3",
     "node-rsa": "^1.0.1",
     "primus": "^7.2.2",
     "webpack-cli": "^3.1.0",
