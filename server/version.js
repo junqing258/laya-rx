@@ -5,19 +5,10 @@ const child_process = require('child_process');
 const chalk  = require('chalk');
 const fsextra = require('fs-extra');
 
-
-const exclude = ['js', 'libs', 'data', 'sounds', 'laya', '.rec', 'index.html', 'index_zsy.html'];
-
 const root_path   = path.resolve(__dirname, '../');
 const bin_path    = path.resolve(__dirname, '../bin');
 const assets_path = path.resolve(__dirname, '../laya/assets');
-
 const publish_dir = fs.readFileSync(root_path+'/publish/gamehall').toString();
-
-let result = {}, last_result = {};
-let atlas = [];
-let unpack_json;
-
 
 start();
 
@@ -26,20 +17,18 @@ async function start() {
 	let commit_id = await getCommitId();
 	let last_commit_id = fs.readFileSync(bin_path+'/commint').toString();
 	let diff_list;
-	if (commit_id!=last_commit_id && last_commit_id!=='null' && last_commit_id!=='undefined') {
+	if (!['', 'null', 'undefined'].includes(last_commit_id)) {
 		diff_list = await getDiff(last_commit_id);
 	}
 	let commit_list = filterAsset(asset_map, diff_list);
-	// console.log('commit list:\n', t.join('\n'));
 
 	async.eachSeries(commit_list, (file_name, done)=> {
-		try {
-			fsextra.copySync(bin_path+'/'+file_name, publish_dir+file_name);
-			console.log(chalk.green(`copy: ${file_name}`));
-		} catch (err) {
-			console.log(err);
-		}
-		done();
+		fsextra.copy(bin_path+'/'+file_name, publish_dir+file_name)
+			.then(() => {
+				console.log(chalk.green(`copy success: ${file_name}`));
+			}).catch(err => {
+				console.log(chalk.red(`copy failed: ${file_name}`));
+			}).finally(done);
 	}, err=> {
 		fs.writeFile(bin_path+'/commint', commit_id, (err)=> {
 			if (err) throw err;
@@ -135,62 +124,4 @@ async function getDiff(last_commit_id) {
 			relove(diff_list);
 		});
 	});
-}
-
-// unpack_json = JSON.parse( fs.readFileSync(`${bin_path}/unpack.json`) );
-
-/* function fileDisplay(filePath, cb) {
-	let files = fs.readdirSync(filePath);
-	async.eachSeries(files, (filename, callback) => {
-		if (exclude.includes(filename)) return callback();
-		var filedir = path.join(filePath, filename);
-		let stats = fs.statSync(filedir);
-		if (stats.isFile()) {
-			setVersion(filePath, filename).then(callback);
-		} else if (stats.isDirectory()) {
-			fileDisplay(filedir, callback);
-		}
-	}, cb);
-} */
-
-/* function setVersion(filePath, filename) {
-	return new Promise(reslove => {
-		let path_key = formatrRelative(path.relative(bin_path, filePath) + `\\${filename}`);
-		result[path_key] = `${ path_key }${ last_commit }`;
-		if (/\.(jpe?g|png)$/i.test(filename)) {
-			let name = /(.*)\.(jpe?g|png)$/i.exec(filename)[1];
-			let changed = false;
-			let res = formatrRelative(path.relative(bin_path, filePath));
-			if (fs.existsSync(`${filePath}/${name}.json`)) {
-				let atlas_dir = (`${res}/${name}`);
-				diff_list.find(changefile=> {
-					if (changefile.match(`laya/assets/${ atlas_dir }`)) {
-						changed = true;
-					}
-					return changed;
-				});
-			} else {
-				diff_list.find(changefile=> {
-					if (changefile.match(`laya/assets/${ res }`)) {
-						changed = true;
-					}
-					return changed;
-				});
-			}
-			if (changed) {
-				result[path_key] = `${ path_key }${ commint_id }`;
-			}
-		}
-		let filedir = path.join(filePath, filename);
-		reslove();
-	});
-} */
-
-function checkChange(filePath, filename) {
-	// diff_list.find();
-}
-
-
-function formatrRelative(str) {
-	return String(str).split(path.sep).join('/');
 }
