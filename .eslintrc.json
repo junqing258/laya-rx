@@ -25,7 +25,8 @@
         "linebreak-style": [0, "windows"],
         "class-methods-use-this": 0,
         "padded-blocks": [0, "always"],
-        "quotes": [0, "double", { "allowTemplateLiterals": true }]
+        "quotes": [0, "double", { "allowTemplateLiterals": true }],
+        "no-use-before-define": ["error", { "functions": false, "classes": true }]
     },
     "extends": [
         "plugin:flowtype/recommended",
