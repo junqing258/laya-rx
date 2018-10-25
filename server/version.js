@@ -7,20 +7,46 @@ const fsextra = require('fs-extra');
 
 const root_path = path.resolve(__dirname, '../');
 const bin_path = path.resolve(__dirname, '../bin/');
-const atlas_dir = 'res/atlas/';
+const atlas_dir = '';
 const rec_path = bin_path + '/' + atlas_dir + '.rec';
-const suffix = 'atlas';
+const suffix = 'json';
+const ui_dir = 'src/ui/layaUI.max.all.js';
 
-const publish_dir = fs.readFileSync(root_path + '/gamehall').toString();
+const commit_path = root_path + '/publish/commint';
+
+const publish_dir = fs.readFileSync(root_path + '/publish/gamehall').toString();
+const publish_app_dir = publish_dir + '/www/files/game/deepseaglory';
+
+let entry_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'entry.json')).toString());;
+/** type:
+ * pic 0, atlas 1, ui 2, js 3 
+*/
+
+
+
+function getJSChunk(name) {
+	if (/^src\/game(teach)?\/.+/.test(name)) {
+		return 'bin/js/game.js';
+	} else {
+		let file_name = Object.keys(entry_data).find(chunk_name=> {
+			if (chunk_name==='game') return false;
+			let item = entry_data[chunk_name].find(v=> v.replace('./','')==name);
+			return !!item;
+		});
+		if (file_name)
+			return `bin/js/${file_name}.js`;
+	}
+	if (/^src\/.+\/.+/.test(name)) return null;
+	return name;
+}
 
 start();
+
 
 async function start() {
 	let asset_map = await getAtlas();
 	let commit_id = await getCommitId();
-	let last_commit_id = await getLastCommitId().catch(e=> {
-		// console.log(e);
-	});
+	let last_commit_id = await getLastCommitId();
 
 	let diff_list = [];
 	if (last_commit_id) {
@@ -28,56 +54,86 @@ async function start() {
 	}
 	let commit_list = filterAsset(asset_map, diff_list);
 
+	let success_flag = true;
+
 	async.eachSeries(commit_list, (item, done)=> {
-		let { type, name, atlas } = item;
-		let atlas_str = atlas ? `${atlas_dir}` : '';
-		let p = `${atlas_str}${name}`;
-		switch (type) {
-			case 'M':
-			case 'A':
-				fsextra.copy(`${bin_path}/${p}`, `${publish_dir}/${p}`)
-					.then(() => {
-						console.log(chalk.green(`copy success: ${p}`));
-					}).catch(err => {
-						console.log(chalk.red(`copy failed: ${p}`));
-					}).finally(done);
-				break;
-			case 'D':
-				fsextra.remove(`${publish_dir}/${p}`)
-					.then(() => {
-						console.log(chalk.green(`remove success: ${p}`));
-					}).catch(err => {
-						console.log(chalk.red(`remove failed: ${p}`));
-					}).finally(done);
-				break;
-			default:
-				done();
-				break;
+		let { act, name, type } = item;
+		if (type==0||type==1) {
+			let type_str = type ? `${atlas_dir}` : '';
+			let p = `${type_str}${name}`;
+			switch (act) {
+				case 'M':
+				case 'A':
+					fsextra.copy(`${bin_path}/${p}`, `${publish_app_dir}/${p}`)
+						.then(() => {
+							console.log(chalk.green(`copy success: ${p}`));
+						}).catch(err => {
+							success_flag = false;
+							console.log(chalk.red(`copy failed: ${p}`));
+						}).finally(done);
+					break;
+				case 'D':
+					fsextra.remove(`${publish_app_dir}/${p}`)
+						.then(() => {
+							console.log(chalk.green(`remove success: ${p}`));
+						}).catch(err => {
+							success_flag = false;
+							console.log(chalk.red(`remove failed: ${p}`));
+						}).finally(done);
+					break;
+				default:
+					done();
+					break;
+				}
+		} else if (type==2) {
+			fsextra.copy(`${root_path}/${ui_dir}`, `${publish_app_dir}/js/layaUI.max.all.js`)
+				.then(() => {
+					console.log(chalk.green(`copy success: ${ui_dir}`));
+				}).catch(err => {
+					success_flag = false;
+					console.log(err);
+					console.log(chalk.red(`copy failed: ${ui_dir}`));
+				}).finally(done);
+		} else if (type==3) {
+			switch (act) {
+				case 'M':
+				case 'A':
+					fsextra.copy(`${root_path}/${name}`, `${publish_app_dir}/${name.replace(/^bin\//, '')}`)
+						.then(() => {
+							console.log(chalk.green(`copy success: ${name}`));
+						}).catch(err => {
+							success_flag = false;
+							console.log(err);
+							console.log(chalk.red(`copy failed: ${name}`));
+						}).finally(done);
+					break;
+			}
 		}
-		// }
 	}, err=> {
-		fs.writeFile(bin_path + '/commint', commit_id, (err)=> {
-			if (err) throw err;
-			console.log(chalk.green.bold(`\ncommint id: ${commit_id}\n`));
-		});
+		if (success_flag) {
+			fs.writeFile(commit_path, commit_id, (err)=> {
+				if (err) throw err;
+				console.log(chalk.green.bold(`\ncommint id: ${commit_id}\n`));
+			});
+		}
 	});
 
 }
 
 function convertAssetList(asset_map) {
 	let asset_list = [];
-	let altas_temp = [];
+	let asset_temp = [];
 	Object.keys(asset_map).forEach(name=> {
 		let value = asset_map[name];
-		let { atlas } = value;
-		let type = 'A';
-		if (!atlas) {
-			asset_list.push({ type, name, atlas });
-		} else if (!altas_temp.includes(name)) {
+		let { type } = value;
+		let act = 'A';
+		if (!type) {
+			asset_list.push({ act, name, type });
+		} else if (!asset_temp.includes(name)) {
 			let key = asset_map[name].key;
-			altas_temp.push(name);
-			asset_list.push({ type, name: `${key}.png`, atlas });
-			asset_list.push({ type, name: `${key}.${suffix}`, atlas });
+			asset_temp.push(name);
+			asset_list.push({ act, name: `${key}.png`, type });
+			asset_list.push({ act, name: `${key}.${suffix}`, type });
 		}
 	});
 	return asset_list;
@@ -88,22 +144,42 @@ function filterAsset(asset_map, diff_list) {
 	if (!diff_list.length) {
 		return convertAssetList(asset_map);
 	}
-	let altas_temp = [];
+	let asset_temp = [];
 	diff_list.forEach(item=> {
-		let type = item.charAt(0);
+		let act = item.charAt(0);
 		let name = item.substr(2);
-		let atlas = 0;
+		let type = 0;
 		if (/^(laya\/assets\/)/.test(name)) {
 			name = name.replace(/^(laya\/assets\/)/, '');
-			if (!altas_temp.includes(name) && asset_map[name] && asset_map[name].atlas) {
+			if (!asset_temp.includes(name) && asset_map[name] && asset_map[name].atlas) {
 				let key = asset_map[name].key;
-				atlas = 1;
-				type = 'M';
-				altas_temp.push(name);
-				commit_list.push({ type, name: `${key}.png`, atlas });
-				commit_list.push({ type, name: `${key}.${suffix}`, atlas });
+				type = 1;
+				act = 'M';
+				asset_temp.push(name);
+				commit_list.push({ act, name: `${key}.png`, type });
+				commit_list.push({ act, name: `${key}.${suffix}`, type });
 			} else {
-				commit_list.push({ type, name, atlas });
+				commit_list.push({ act, name, type });
+			}
+		} else if (/^(laya\/pages\/)/.test(name)) {
+			name = 'src/ui/layaUI.max.all.js';
+			act = 'M';
+			type = 2;
+			if (!asset_temp.includes(name)) {
+				asset_temp.push(name);
+				commit_list.push({ act, name, type });
+			}
+		} else if (/^(src\/)/.test(name)) {
+			type = 3;
+			name = getJSChunk(name);
+			if (name && !asset_temp.includes(name)) {
+				asset_temp.push(name);
+				commit_list.push({ act, name, type });
+
+				name += '.map';
+				if (fs.existsSync(root_path + '/' + name)) {
+					commit_list.push({ act, name, type });
+				}
 			}
 		}
 	});
@@ -123,14 +199,14 @@ async function getAtlas() {
 			if (regD.test(str)) {
 				key = regD.exec(str)[1];
 			} else {
-				let atlas = 0;
+				let type = 0;
 				let e = regP.exec(str);
-				if (e) atlas = 1;
+				if (e) type = 1;
 				else e = regR.exec(str);
 				if (e) {
 					let name = `${key}/${e[2]}`;
 					let v = e[1];
-					map[name] = { atlas, v, key };
+					map[name] = { type, v, key };
 				}
 			}
 		});
@@ -170,8 +246,8 @@ async function getDiff(last_commit_id) {
 
 async function getLastCommitId() {
 	return new Promise((resolve, reject)=> {
-		fs.readFile(bin_path + '/commint', (err, data) => {
-			if (err) reject(err);
+		fs.readFile(commit_path, (err, data) => {
+			if (err) resolve('');
 			else resolve(data.toString());
 		});
 	});
