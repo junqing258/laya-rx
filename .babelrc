@@ -1,26 +1,13 @@
 {
-  "presets": [
-    ["env", { "modules": false } ],
-    "stage-0",
-    "flow"
-  ],
-  "env": {
-    "targets": {
-      "browsers": [
-        "last 2 versions",
-        "safari >= 7"
-      ]
-    }
-  },
-  "plugins": [
-    [
-      "transform-async-to-module-method",
-      {
-        "module": "bluebird",
-        "method": "coroutine"
-      }
+    "presets": [
+      [ "@babel/preset-env", { "modules": false, "useBuiltIns": "entry" } ]
     ],
-    "transform-decorators-legacy",
-    "transform-class-properties"
-  ]
+    "plugins": [
+        [ "@babel/plugin-transform-async-to-generator", {
+          "module": "bluebird",
+          "method": "coroutine"
+        } ],
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+        ["@babel/plugin-proposal-class-properties", { "loose": true }]
+    ]
 }

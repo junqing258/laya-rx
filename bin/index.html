@@ -49,6 +49,26 @@
         4aaOlQp584uKP1zU/wIDAQAB\
         ';
     </script>
+
+
+    <script type="text/javascript">
+        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                const prefix = location.pathname.replace(/\/(index\.html)?$/, '');
+                navigator.serviceWorker.register(`${prefix}/sw.js`)
+                    .then(function(registration) {
+                        // Registration was successful
+                        console.log('[success] scope: ', registration.scope);
+                    }, function(err) {
+                        // registration failed :(
+                        console.log('[fail]: ', err);
+                    });
+            });
+        }
+
+    </script>
+
     <!--<script src="http://172.21.10.120:8080/webpack-dev-server.js"></script>-->
     <script src="js/bundle.js"></script>
 </body>
