@@ -2,7 +2,7 @@ import BonusBorad from "components/playcompone/BonusBorad";
 
 export default class BonusSense {
 
-	constructor(mode) {
+	constructor(mode: ?string) {
 		this.init();
 	}
 

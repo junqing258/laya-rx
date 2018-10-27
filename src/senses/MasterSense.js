@@ -1,4 +1,4 @@
-
+// @flow
 import { MASTER_ASSET } from "const/assets";
 import SenseManager, { sense } from "utils/SenseManager";
 import { registeFnt } from "utils/util";

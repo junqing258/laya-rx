@@ -1,4 +1,4 @@
-
+// @flow
 let curSense, curRouter, routerList = [], componentList = [], hisRouters = [], lockedHash = true;
 
 let firstIn = true;
@@ -11,7 +11,7 @@ export default class SenseManager {
             routerList[i] = v.router;
             let component = v.component;
             if (!component.getInstance) {
-                component.getInstance = function() {
+                component.getInstance = function () {
                     if (!component.instance||component.instance.destroyed) component.instance = new component();
                     return component.instance;
                 };
