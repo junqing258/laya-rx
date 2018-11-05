@@ -200,12 +200,12 @@ async function getAtlas() {
                 key = reg_d.exec(str)[1];
             } else {
                 let type = 0;
-                let e = reg_p.exec(str);
-                if (e) type = 1;
-                else e = reg_r.exec(str);
-                if (e) {
-                    let name = `${key}/${e[2]}`;
-                    let v = e[1];
+                let result = reg_p.exec(str);
+                if (result) type = 1;
+                else result = reg_r.exec(str);
+                if (result) {
+                    let name = `${key}/${result[2]}`;
+                    let v = result[1];
                     map[name] = { type, v, key };
                 }
             }
