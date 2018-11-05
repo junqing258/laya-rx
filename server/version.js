@@ -17,7 +17,7 @@ const commit_path = root_path + '/publish/commint';
 const publish_dir = fs.readFileSync(root_path + '/publish/gamehall').toString();
 const publish_app_dir = publish_dir + '/www/files/game/deepseaglory';
 
-let entry_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'entry.json')).toString());;
+const entry_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'entry.json')).toString());;
 /** type:
  * pic 0, atlas 1, ui 2, js 3 
  */
@@ -188,21 +188,21 @@ function filterAsset(asset_map, diff_list) {
 
 async function getAtlas() {
     return new Promise((relove, reject) => {
-        let rec = fs.readFileSync(rec_path).toString().split('\n');
+        const rec = fs.readFileSync(rec_path).toString().split('\n');
 
-        let regD = /^D\ (.+)/;
-        let regP = /^P\ (.+)\ (.+\.png)/;
-        let regR = /^[A-Z]\ (.+)\ (.+\.png)/;
+        let reg_d = /^D\ (.+)/,
+            reg_p = /^P\ (.+)\ (.+\.png)/,
+            reg_r = /^[A-Z]\ (.+)\ (.+\.png)/;
 
         let key, map = {};
         rec.forEach((str, i) => {
-            if (regD.test(str)) {
-                key = regD.exec(str)[1];
+            if (reg_d.test(str)) {
+                key = reg_d.exec(str)[1];
             } else {
                 let type = 0;
-                let e = regP.exec(str);
+                let e = reg_p.exec(str);
                 if (e) type = 1;
-                else e = regR.exec(str);
+                else e = reg_r.exec(str);
                 if (e) {
                     let name = `${key}/${e[2]}`;
                     let v = e[1];
