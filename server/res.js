@@ -334,7 +334,7 @@ async function getDiff(last_commit_id) {
 async function getLastCommitData() {
     return new Promise((resolve, reject) => {
         fs.readFile(commit_path, (err, data) => {
-            if (err) resolve(err);
+            if (err) reject(err);
             else resolve(JSON.parse(data.toString()));
         });
     });
