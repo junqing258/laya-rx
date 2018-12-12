@@ -4,6 +4,8 @@ const child_process = require('child_process');
 const chalk = require('chalk');
 const eachSeries = require('async/eachSeries');
 const fsextra = require('fs-extra');
+const log = require('fancy-log');
+const { getJsChunkName } = require('../webpack.config');
 
 const root_path = path.resolve(__dirname, '../');
 const bin_path = path.resolve(__dirname, '../bin/');
@@ -18,17 +20,12 @@ const publish_dir = fs.readFileSync(root_path + '/publish/gamehall').toString();
 const publish_app_dir = publish_dir + '/www/files/game/deepseaglory';
 const publish_app_index = publish_dir + '/app/template/game/deepseaglory/index.html';
 
-const entry_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'entry.json')).toString());
-
 let args = process.argv.splice(2);
 
-/* type: pic 0, atlas 1, ui 2, js 3  */
-
-start();
-
-async function start() {
+(async ()=> {
     let commit_id = await getCommitId();
     let commit_data = await getLastCommitData().catch(err=> console.log(err));
+    if (!fs.existsSync(rec_path)) return console.log(chalk.red('\u8bf7\u5148\u53d1\u5e03\u8d44\u6e90')); 
 	let rec_version = parseInt(fs.statSync(rec_path).ctimeMs);
 
     let diff_list = [];
@@ -36,6 +33,7 @@ async function start() {
         let { last_commit_id, last_rec_version } = commit_data;
         if (args && args.length) last_commit_id = args[0];
 		diff_list = await getDiff(last_commit_id);
+
         let has_change_ui = diff_list.find(item=> {
 			let name = item.substr(2);
 			if (/^(laya\/)/.test(name)) {
@@ -49,9 +47,9 @@ async function start() {
 			return false;
 		});
 		/* laya/文件夹有变更, 需要laya资源 */
-		if (has_change_ui) {
+		 if (has_change_ui) {
 			return console.log(chalk.red('\u8bf7\u5148\u53d1\u5e03\u8d44\u6e90'));
-		}
+		} 
     }
 
     let asset_map = await getAtlas();
@@ -85,7 +83,7 @@ async function start() {
                 case 'D': //删除
                     fsextra.remove(`${publish_app_dir}/${p}`)
                         .then(() => {
-                            delete version_map[p];
+                            // delete version_map[p];
                             console.log(chalk.gray(`${act} success: ${p}`));
                             next();
                         }).catch(err => {
@@ -135,35 +133,35 @@ async function start() {
             }
         }
     }, error => {
+        /* 更新gameHall js 版本号 */
+        updateScriptVersion(script_list, commit_id);
+        /* 更新 commit.json 和 version.json */
+        commit_data.last_commit_id = commit_id;
+        commit_data.last_rec_version = rec_version;
+        let t = fs.writeFileSync( bin_path+'/version.json', JSON.stringify(version_map) );
+        fsextra.copy(bin_path+'/version.json', `${publish_app_dir}/version.json`);
+
         if (success_flag) {
-            /* 更新gameHall js 版本号 */
-            updateScriptVersion(script_list, commit_id);
-            /* 更新 commit.json 和 version.json */
-			commit_data.last_commit_id = commit_id;
-			commit_data.last_rec_version = rec_version;
-            let t = fs.writeFileSync( bin_path+'/version.json', JSON.stringify(version_map) );
-            fsextra.copy(bin_path+'/version.json', `${publish_app_dir}/version.json`);
             fs.writeFileSync( commit_path, JSON.stringify(commit_data) );
-            
             console.log(chalk.green.bold(`\ncomplete with commit: ${commit_id}`));
         }
     });
 
-}
+})();
 
 /* gameHall index.html js 版本号 */
 function updateScriptVersion(script_list, commit_id) {
     let htmlcont = fs.readFileSync(publish_app_index).toString();
-    let jsreg = /<!--jsfile--startTag-->((?:.|(?:\r?\n))*)<!--jsfile--endTag-->/;
+    let jsreg = /<!--version--startTag-->((?:.|(?:\r?\n))*)<!--version--endTag-->/;
     let oldscript = jsreg.exec(htmlcont);
     if (!oldscript || !oldscript.length>1) return;
     let version_inner = oldscript[1];
     script_list.forEach(jsname=> {
         if (!/\.js?/.test(jsname)) return;
-        let reg = new RegExp(`(${jsname}[\?]v=)(.*)\"`);
-        version_inner = version_inner.replace(reg, `$1${commit_id}\"`);
+        let reg = new RegExp(`(${jsname}[\?]v=)(.+)(\"|\'')`);
+        version_inner = version_inner.replace(reg, `$1${commit_id}$3`);
     });
-    htmlcont = htmlcont.replace(jsreg, `<!--jsfile--startTag-->${version_inner}<!--jsfile--endTag-->`);
+    htmlcont = htmlcont.replace(jsreg, `<!--version--startTag-->${version_inner}<!--version--endTag-->`);
     fs.writeFileSync(publish_app_index, htmlcont);
 }
 
@@ -172,26 +170,11 @@ async function getVersionMap(asset_map) {
     return new Promise((reslove, reject)=> {
         let version_path = bin_path+'/version.json';
         let version_map = {};
-        if (!fs.existsSync(version_path)) return reject(new Error('no version config'));
-        version_map = JSON.parse(fs.readFileSync(version_path).toString());
+        if (fs.existsSync(version_path)) {
+            version_map = JSON.parse(fs.readFileSync(version_path).toString());
+        }
         reslove(version_map);
     });
-}
-
-/* 根据src下的js映射打包后的js */
-function getJSChunk(name) {
-    if (/^src\/game(teach)?\/.+/.test(name)) {
-        return 'bin/js/game.js';
-    } else {
-        let file_name = Object.keys(entry_data).find(chunk_name => {
-            if (chunk_name === 'game') return false;
-            return !!entry_data[chunk_name].find(v => v.replace('./', '') == name);
-        });
-        if (file_name)
-            return `bin/js/${file_name}.js`;
-    }
-    if (/^src\/.+\/.+/.test(name)) return null;
-    return name;
 }
 
 /**
@@ -230,9 +213,11 @@ function filterAsset(asset_map, diff_list) {
                     case 'D':
                     case 'R':
                         let dir = args[1].replace(/(.*)\/.*$/, '$1');
+                        key = dir.replace(/^(laya\/assets\/)/, '');
                         if (!fs.existsSync(dir)) {
-                            commit_list.push({ act:'D', name: `${dir}.png`, type });
-                            commit_list.push({ act:'D', name: `${dir}.${suffix}`, type });
+                            commit_list.push({ act:'D', name: `${key}.png`, type });
+                            commit_list.push({ act:'D', name: `${key}.${suffix}`, type });
+                            return;
                         }
                         break;
                     default:
@@ -241,20 +226,39 @@ function filterAsset(asset_map, diff_list) {
                 commit_list.push({ act:'M', name: `${key}.png`, type });
                 commit_list.push({ act:'M', name: `${key}.${suffix}`, type });
             } else if (!asset_temp.includes(name)) {
+                let dir = args[1].replace(/(.*)\/.*$/, '$1'),
+                key = dir.replace(/^(laya\/assets\/)/, '');
+                if (act==='D'||act==='R') {
+                    let atlas = Object.keys(asset_map).find(v=> new RegExp(`${key}/.+`).test(name));
+                    if (atlas && !asset_temp.includes(key)) {
+                        type = 1;
+                        asset_temp.push(key);
+                        if (!fs.existsSync(dir)) {
+                            commit_list.push({ act:'D', name: `${key}.png`, type });
+                            commit_list.push({ act:'D', name: `${key}.${suffix}`, type });
+                        } else if (fs.existsSync( `${bin_path}/${key}.${suffix}`)) {
+                            commit_list.push({ act:'M', name: `${key}.png`, type });
+                            commit_list.push({ act:'M', name: `${key}.${suffix}`, type });
+                        }
+                        return;
+                    }
+                }
+
                 asset_temp.push(name);
                 commit_list.push({ act, name, type });
             }
         } else if (/^(laya\/pages\/)/.test(name)) {
-            name = 'src/ui/layaUI.max.all.js';
-            type = 2;
+            name = getJsChunkName('src/ui/layaUI.max.all.js');
+            console.log(name);
+            type = 3;
             if (!asset_temp.includes(name)) {
                 act = 'M';
                 asset_temp.push(name);
                 commit_list.push({ act, name, type });
             }
-        } else if (/^(src\/)/.test(name)) {
+        } else if (/^(src|sail)\//.test(name)) {
             type = 3;
-            name = getJSChunk(name);
+            name = getJsChunkName(name);
             if (name && !asset_temp.includes(name)) {
                 asset_temp.push(name);
                 commit_list.push({ act, name, type });
@@ -284,9 +288,9 @@ async function getAtlas() {
             } else if (str) { // 非图集
                 let type = 0;
                 let result = reg_p.exec(str);
-                if (result) 
+                if (result)
                     type = 1;
-                else 
+                else
                     result = reg_r.exec(str);
                 if (result) {
                     let name = `${key}/${result[2]}`;
@@ -318,15 +322,20 @@ async function getCommitId() {
 /* git diff 差异 */
 async function getDiff(last_commit_id) {
     return new Promise((relove, reject) => {
-        let diff_list = [];
-        let git_diff = child_process.spawn('git', ['diff', last_commit_id, '--name-status']); //
-        git_diff.stdout.on('data', (data) => {
+        // let diff_list = [];
+        let git_diff = child_process.spawnSync('git', ['diff', last_commit_id, '--name-status'], {
+            maxBuffer: 1024 * 1024
+        });
+        /* git_diff.stdout.on('data', (data) => {
             let list = data.toString().split('\n').map(v => v.trim());
             diff_list = diff_list.concat(list);
         });
         git_diff.on('close', () => {
             relove(diff_list);
-        });
+        }); */
+        let data = git_diff.stdout;
+        let diff_list = data.toString().split('\n').map(v => v.trim());
+        relove(diff_list);
     });
 }
 
