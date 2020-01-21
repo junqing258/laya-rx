@@ -33,10 +33,10 @@ export default class Background extends Laya.Sprite {
         
         let i = 0;
         const interval = 60, degree = 2.5;
-        PubSub.on("SHOCK_LINE", this, ()=> {
+        /*PubSub.on("SHOCK_LINE", this, ()=> {
             i = 0;
             Laya.timer.loop(interval, this, loop);
-        });
+        });*/
 
         function loop() {
             if (i>=jello.length) return Laya.timer.clear(self, loop); 
