@@ -77,10 +77,10 @@ module.exports = function(config) {
             }
         },
 
-        /*middleware: ["static"],
+        middleware: ["static"],
         static: {
             path: path.join(__dirname, "bin")
-        },*/
+        },
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
         singleRun: false,
