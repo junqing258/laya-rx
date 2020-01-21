@@ -1,6 +1,7 @@
-module {{pack}} {
+module ui.{{pack}} {
     export class {{className}} extends {{classType}} {
-	{{vars}}
+        {{each vars}}public {{$value[0]}}: {{$value[1]}};
+        {{/each}}
         public static  uiView:any ={{uiObj}};
         constructor(){ super()}
         createChildren():void {

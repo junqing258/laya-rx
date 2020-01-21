@@ -50,6 +50,7 @@
     "webpack-dev-server": "^3.10.1",
     "webpack-notifier": "^1.7.0",
     "workbox-build": "^3.6.3",
+    "xmldom": "^0.2.1",
     "yargs": "^15.1.0"
   },
   "scripts": {

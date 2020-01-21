@@ -7,15 +7,13 @@ const spawn = require("child_process").spawn;
 const os = require("os");
 const template = require("art-template");
 
-require("./ProjectExportTools/LayaAirCmdTool.max.js");
-
 // const argv = require('yargs').argv;
 
-const CodeManager = laya.editor.manager.CodeManager;
+const UIParser = require("./UIParser");
 
-const uiStr = template(__dirname + "/tpl/ui.art", {
-	className: "AABB",
-	vars: []
-});
+const parser = new UIParser();
+const data = parser.parse(path.resolve(__dirname, "../laya/pages/senses/Loadding.ui"));
+
+const uiStr = template(__dirname + "/tpl/ui.art", data);
 
 fs.writeFileSync(__dirname + "/A.ts", uiStr);
