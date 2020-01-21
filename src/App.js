@@ -2,7 +2,6 @@
 import "utils/laya.custom.js";
 import "ui/layaUI.max.all.js";
 
-import { socket } from "ctrl/socket";
 import SenseManager from "utils/SenseManager";
 import { COMMON_ASSET } from "const/assets";
 

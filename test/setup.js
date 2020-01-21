@@ -1,3 +1,6 @@
+
+
+
 window.GM = {
     userLogged: true,
     user_id: 111
@@ -14,6 +17,8 @@ window.publicKey =
         ArDsnaUhKoF01GwLZL6VkgYefAowYLAfO4LmRhO8L0sflkw2HfjpgyfumqXLR/nO\
         4aaOlQp584uKP1zU/wIDAQAB\
         ";
+
+import "../src/utils/laya.custom.js";
 
 function App() {
     const { Stage } = Laya;
