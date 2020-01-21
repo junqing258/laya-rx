@@ -5,8 +5,8 @@ describe("Background", function() {
 	
 	it('UI', () => {
 		const bg = Background.getInstance();
-
 		expect(bg instanceof Laya.Sprite).toBe(true);
+		bg.event('click');
 	});
 
 });
