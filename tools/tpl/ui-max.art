@@ -1,0 +1,5 @@
+import View=laya.ui.View;
+import Dialog=laya.ui.Dialog;
+{{each files file index}}
+{{@file}}
+{{/each}}

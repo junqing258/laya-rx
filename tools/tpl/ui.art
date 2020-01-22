@@ -1,9 +1,12 @@
-module ui.{{pack}} {
+export module ui.{{pack}} {
+    {{each imports}}import {{$value[0]}} = {{$value[1]}};
+    {{/each}}
     export class {{className}} extends {{classType}} {
         {{each vars}}public {{$value[0]}}: {{$value[1]}};
         {{/each}}
-        public static  uiView:any ={{uiObj}};
-        constructor(){ super()}
+        public static uiView:any = {{@uiObj}};
+        
+        constructor() { super(); }
         createChildren():void {
         {{viewClassMap}}
             super.createChildren();
