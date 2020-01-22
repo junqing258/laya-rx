@@ -8,7 +8,6 @@ export module ui.{{pack}} {
         
         constructor() { super(); }
         createChildren():void {
-        {{viewClassMap}}
             super.createChildren();
             this.createView({{pack}}.{{className}}.uiView);
         }
