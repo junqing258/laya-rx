@@ -1,5 +1,8 @@
 import View=laya.ui.View;
 import Dialog=laya.ui.Dialog;
-{{each files file index}}
-{{@file}}
+
+{{each viewRegs}}View.regComponent("{{$value[0]}}", {{$value[1]}});
+{{/each}}
+{{each tpls tpl index}}
+{{@tpl}}
 {{/each}}
