@@ -10,7 +10,7 @@
     "mockjs": "^1.0.1-beta3",
     "node-rsa": "^1.0.1",
     "primus": "^7.2.2",
-    "ws": "^6.0.0"
+    "ws": "^7.4.5"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",
